@@ -20,6 +20,7 @@ namespace WinUpTool
                 InitializeComponent();
                 DialogResult abouttool = MessageBox.Show("Tool chỉ block update Windows không tắt services Windows Update :))))");
                 ReloadStatusBlocking();
+                timer1.Start();
             }
             else
             {
@@ -35,18 +36,14 @@ namespace WinUpTool
 
         private void toolToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult abouttool = MessageBox.Show("V1.0.0 - Create Tool for fun !");
+            MessageBox.Show("V1.0.0 - Create Tool for fun !");
         }
 
         private void meToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            DialogResult abouttool = MessageBox.Show("I'm Qynklee, a idiot with laziness", "Konnichiwa");
+            MessageBox.Show("I'm Qynklee, an idiot with laziness", "Konnichiwa");
         }
 
-        private void button3_Click(object sender, EventArgs e)
-        {
-            
-        }
 
         public void ReloadStatusBlocking()
         {
@@ -58,6 +55,46 @@ namespace WinUpTool
             {
                 label_Status.Text = "Update is Blocked!";
             }
+            label_SvStt.Text = ST.CheckStatusServiceUpdate();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            ReloadStatusBlocking();
+
+        }
+
+        private void button_Enable_Click(object sender, EventArgs e)
+        {
+            ST.EnableUpdate();
+
+        }
+
+        private void button_Block_Click(object sender, EventArgs e)
+        {
+            if (ST.BlockUpdate())
+            {
+                MessageBox.Show("Block Update Successfully");
+            }
+            else
+            {
+                MessageBox.Show("ERRORRR :((((");
+            }
+        }
+
+        private void button_Service_Click(object sender, EventArgs e)
+        {
+            ST.ChangeStartupTypeServiceUpdate();
+            MessageBox.Show("Changed!");
+        }
+
+        private void guideToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Service Update turn off: You can download app in Store!");
+            MessageBox.Show("Block Update: You dont need update Windows anymore");
+            MessageBox.Show("Block Update does not same Turn off Service Update");
+
         }
     }
+
 }

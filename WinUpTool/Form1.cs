@@ -15,7 +15,7 @@ namespace WinUpTool
         public SystemTweak ST = new SystemTweak();
         public Form1()
         {
-            if (ST.IsRunAsAdmin())
+            if (ST.IsRunAsAdmin() && ST.CheckBuildAndEditionWindows())
             {
                 InitializeComponent();
                 DialogResult abouttool = MessageBox.Show("Tool chỉ block update Windows không tắt services Windows Update :))))");
@@ -36,7 +36,7 @@ namespace WinUpTool
 
         private void toolToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("V1.0.0 - Create Tool for fun !");
+            MessageBox.Show("V1.1.0 - Create Tool for fun !");
         }
 
         private void meToolStripMenuItem_Click(object sender, EventArgs e)
@@ -47,14 +47,8 @@ namespace WinUpTool
 
         public void ReloadStatusBlocking()
         {
-            if (ST.NowIsBlocking() == 0)
-            {
-                label_Status.Text = "Update is Running!";
-            }
-            else
-            {
-                label_Status.Text = "Update is Blocked!";
-            }
+
+            label_Status.Text = ST.NowIsBlocking();
             label_SvStt.Text = ST.CheckStatusServiceUpdate();
         }
 
@@ -67,7 +61,7 @@ namespace WinUpTool
         private void button_Enable_Click(object sender, EventArgs e)
         {
             ST.EnableUpdate();
-
+            MessageBox.Show("Done!");
         }
 
         private void button_Block_Click(object sender, EventArgs e)
@@ -90,10 +84,23 @@ namespace WinUpTool
 
         private void guideToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Service Update turn off: You can download app in Store!");
+            MessageBox.Show("Service Update disable: You cant download app in Store!");
             MessageBox.Show("Block Update: You dont need update Windows anymore");
+            MessageBox.Show("Pause Update until 2050: You will need update windows in 2050/1/1 :vvv");
+            MessageBox.Show("Best Block Update: Good Choice if you want to forget all update :D");
             MessageBox.Show("Block Update does not same Turn off Service Update");
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DialogResult YourChoice = MessageBox.Show("This option = Block Update + Disable Service Update + . Continue?", "Are you sure ?", MessageBoxButtons.YesNo);
+            if (YourChoice == DialogResult.Yes)
+            {
+                ST.ChangeStartupTypeServiceUpdate();
+                ST.BlockUpdate();
+                MessageBox.Show("Stop + Block is done !");
+            }
         }
     }
 

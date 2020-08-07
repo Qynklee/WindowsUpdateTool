@@ -42,29 +42,38 @@ namespace WinUpTool
         /// 1 is Blocked, 0 is Not Block
         /// </summary>
         /// <returns></returns>
-        public int NowIsBlocking()
+        public string NowIsBlocking()
         {
-            string temp = "";
-            try
-            {
-                RegistryKey root = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
-                var key = root.OpenSubKey(@"SOFTWARE\Microsoft\WindowsUpdate\UpdatePolicy\Settings", false);
-                var thisValue = key.GetValue(@"PausedQualityStatus");
-                temp = thisValue.ToString();
-            }
-            catch
-            {
-                
-            }
+            string temp1 = "";
+            RegistryKey root = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+            var key = root.OpenSubKey(@"SOFTWARE\Microsoft\WindowsUpdate\UpdatePolicy\Settings", false);
+            var thisValue = key.GetValue(@"PausedQualityStatus");
+            temp1 = thisValue.ToString();
+            var BlockDateValue = key.GetValue(@"PausedFeatureDate");
 
-            if (temp == "0")
+            string SttUpdateSrv = CheckStatusServiceUpdate();
+
+            if (BlockDateValue == null && temp1 == "0" && SttUpdateSrv != "Disable")
             {
-                return 0;
+                return "Running :<";
             }
-            else if (temp == "1")
-                return 1;
+            if(BlockDateValue == null && temp1 == "0" && SttUpdateSrv == "Disable")
+            {
+                return @"Block by disable service :>";
+            }
+            if (BlockDateValue != null && temp1 == "1" && SttUpdateSrv != "Disable")
+            {
+                return "Paused Update until 2050 :)";
+            }
+            if(BlockDateValue != null && temp1 == "1" && SttUpdateSrv == "Disable")
+            {
+                return "Best Block Update :D";
+            }
             else
-                return -1;
+            {
+                return "Running :<<<";
+            }
+            
         }
 
 
@@ -85,6 +94,41 @@ namespace WinUpTool
             currentSID = s.ToString();
 
             return currentSID;
+        }
+
+        public bool CheckBuildAndEditionWindows()
+        {
+            try
+            {
+                RegistryKey root = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64);
+                var key = root.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", false);
+                var EditionWin = key.GetValue(@"EditionID");
+                var BuildVersion = key.GetValue(@"CurrentBuildNumber");
+
+                string temp = EditionWin.ToString();
+                if (temp.Contains("Home"))
+                {
+                    return false;
+                }
+                else
+                {
+                    temp = BuildVersion.ToString();
+                    long buildver = Convert.ToInt64(temp);
+
+                    if (buildver <= 15063)
+                    {
+                        return false;
+                    }
+                    else
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
 
 
@@ -132,7 +176,7 @@ namespace WinUpTool
                 key2.DeleteValue("PausedFeatureDate");
                 key2.DeleteValue("PausedQualityDate");
 
-                ChangeServiceStartType("wuauserv", ServiceStartupType.Manual);
+                
             }
             catch
             {
